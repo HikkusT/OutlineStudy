@@ -5,6 +5,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 [RequireComponent(typeof(Camera))]
 public class Outline : MonoBehaviour {
+	#region public_variables
 	[SerializeField] Color _backgroundColor = new Color(1, 1, 1, 0);
 	[SerializeField] Color _lineColor = new Color(0, 0, 0, 1);
 	[SerializeField, Range(0, 1)] float _colorSensitivity = 1f;
@@ -12,16 +13,19 @@ public class Outline : MonoBehaviour {
 	[SerializeField, Range(0, 1)] float _depthSensitivity = 1f;
 	[SerializeField, Range(0, 2)] float _lowerThreshold = 0.05f;
 	[SerializeField, Range(0, 2)] float _upperThreshold = 1f;
-	public FilterType filter;
+	[SerializeField] FilterType _filter;
+	[SerializeField] bool _canny;
 	[SerializeField] Shader _shader;
-	Material _material;
+	#endregion
 
-	// Use this for initialization
+	#region private_variables
+	Material _material;
+	#endregion
+
 	void Start () {
 		
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if(_depthSensitivity > 0 || _normalSensitivity > 0)
 			GetComponent<Camera>().depthTextureMode |= DepthTextureMode.DepthNormals;
@@ -43,28 +47,38 @@ public class Outline : MonoBehaviour {
 		_material.SetFloat("_Threshold", _lowerThreshold);
 		_material.SetFloat("_InvRange", 1f/(_upperThreshold - _lowerThreshold));
 
-		if(filter == FilterType.Roberts)
+		if(_filter == FilterType.Roberts)
 		{
 			_material.EnableKeyword("_ROBERTS_CROSS");
 			_material.DisableKeyword("_PREWITT");
 			_material.DisableKeyword("_SOBEL");
 		}
 
-		if(filter == FilterType.Prewitt)
+		if(_filter == FilterType.Prewitt)
 		{
 			_material.DisableKeyword("_ROBERTS_CROSS");
 			_material.EnableKeyword("_PREWITT");
 			_material.DisableKeyword("_SOBEL");
 		}
 
-		if(filter == FilterType.Sobel)
+		if(_filter == FilterType.Sobel)
 		{
 			_material.DisableKeyword("_ROBERTS_CROSS");
 			_material.DisableKeyword("_PREWITT");
 			_material.EnableKeyword("_SOBEL");
 		}
 
-		Graphics.Blit(src, dest, _material);
+		if(_canny)
+		{
+			_material.EnableKeyword("_CANNY");
+			RenderTexture grab = new RenderTexture(src);
+			Graphics.Blit(src, grab, _material, 0);
+			_material.SetTexture("_GrabTex", grab);
+		}
+		else
+			_material.DisableKeyword("_CANNY");
+
+		Graphics.Blit(src, dest, _material, 1);
 	}
 }
 
