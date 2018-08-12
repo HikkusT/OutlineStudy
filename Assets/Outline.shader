@@ -75,7 +75,7 @@
 		Pass
 		{
 			CGPROGRAM
-			#pragma multi_compile _ROBERTS_CROSS _PREWITT _SOBEL
+			#pragma multi_compile _ROBERTS_CROSS _PREWITT _SOBEL _KIRSCH
 			#pragma multi_compile __ _CANNY
 			#pragma vertex vert
 			#pragma fragment frag
@@ -163,6 +163,26 @@
 			#ifdef _SOBEL
 				gx = (dt.tl - dt.tr) + 2 * (dt.ml - dt.mr) + (dt.bl - dt.br);
 				gy = (dt.tl - dt.bl) + 2 * (dt.tc - dt.br) + (dt.tr - dt.br);
+			#endif
+
+			#ifdef _KIRSCH
+				float3 g1 = 5 * (dt.tl + dt.tc + dt.tr) - 3 * (dt.bl + dt.bc + dt.br + dt.ml + dt.mr);
+				float3 g2 = 5 * (dt.ml + dt.tl + dt.tc) - 3 * (dt.bl + dt.bc + dt.br + dt.mr + dt.tr);
+				float3 g3 = 5 * (dt.bl + dt.ml + dt.tl) - 3 * (dt.bc + dt.br + dt.mr + dt.tc + dt.tr);
+				float3 g4 = 5 * (dt.bl + dt.bc + dt.ml) - 3 * (dt.br + dt.mr + dt.tl + dt.tc + dt.tr);
+				float3 g5 = 5 * (dt.bl + dt.bc + dt.br) - 3 * (dt.ml + dt.mr + dt.tl + dt.tc + dt.tr);
+				float3 g6 = 5 * (dt.bc + dt.br + dt.mr) - 3 * (dt.bl + dt.ml + dt.tl + dt.tc + dt.tr);
+				float3 g7 = 5 * (dt.br + dt.mr + dt.tr) - 3 * (dt.bl + dt.bc + dt.ml + dt.tl + dt.tc);
+				float3 g8 = 5 * (dt.mr + dt.tc + dt.tr) - 3 * (dt.bl + dt.bc + dt.br + dt.ml + dt.tl);
+
+				return max(length(g1),
+					       max(length(g2),
+						       max(length(g3),
+							       max(length(g4),
+								       max(length(g5),
+									       max(length(g6),
+										       max(length(g7),
+											       length(g8))))))));
 			#endif
 
 				return sqrt(dot(gx, gx) + dot(gy, gy));

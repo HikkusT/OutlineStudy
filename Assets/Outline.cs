@@ -52,6 +52,7 @@ public class Outline : MonoBehaviour {
 			_material.EnableKeyword("_ROBERTS_CROSS");
 			_material.DisableKeyword("_PREWITT");
 			_material.DisableKeyword("_SOBEL");
+			_material.DisableKeyword("_KIRSCH");
 		}
 
 		if(_filter == FilterType.Prewitt)
@@ -59,6 +60,7 @@ public class Outline : MonoBehaviour {
 			_material.DisableKeyword("_ROBERTS_CROSS");
 			_material.EnableKeyword("_PREWITT");
 			_material.DisableKeyword("_SOBEL");
+			_material.DisableKeyword("_KIRSCH");
 		}
 
 		if(_filter == FilterType.Sobel)
@@ -66,6 +68,15 @@ public class Outline : MonoBehaviour {
 			_material.DisableKeyword("_ROBERTS_CROSS");
 			_material.DisableKeyword("_PREWITT");
 			_material.EnableKeyword("_SOBEL");
+			_material.DisableKeyword("_KIRSCH");
+		}
+
+		if(_filter == FilterType.Kirsch)
+		{
+			_material.DisableKeyword("_ROBERTS_CROSS");
+			_material.DisableKeyword("_PREWITT");
+			_material.DisableKeyword("_SOBEL");
+			_material.EnableKeyword("_KIRSCH");
 		}
 
 		if(_canny)
@@ -85,5 +96,6 @@ public class Outline : MonoBehaviour {
 public enum FilterType{
 	Roberts,
 	Prewitt,
-	Sobel
+	Sobel,
+	Kirsch
 }
